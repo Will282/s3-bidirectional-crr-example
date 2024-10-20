@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8.3.3,<9
+pre-commit>=4.0.1,<5
+syrupy>=4.7.2,<5
+cdk-nag>=2.29.12,<3

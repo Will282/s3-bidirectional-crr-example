@@ -1,0 +1,30 @@
+[project]
+name = "s3-bidirectional-crr-example"
+description = "XXX"
+authors = []
+license = ""
+readme = "README.md"
+
+[[tool.mypy.overrides]]
+module = [
+  "schema",
+]
+ignore_missing_imports = true
+
+[tool.black]
+line-length = 120
+
+[tool.flake8]
+max-line-length = 120
+ignore = ["E266", "W503", "E203"]
+exclude = [".git", "__pycache__", "build", "dist", ".venv"]
+
+[tool.isort]
+profile = "black"
+skip = [".yml"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+pythonpath = "."

@@ -1,0 +1,310 @@
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>"
+    }
+  },
+  "Resources": {
+    "AWS679f53fac002430cb0da5b7982bd22872D164C4C": {
+      "DependsOn": [
+        "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2"
+      ],
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-eu-west-1"
+          },
+          "S3Key": "ce2f3595a340d6c519a65888ef97e3b9b64f053f83608e32cc28162e22d7d99a.zip"
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs20.x",
+        "Timeout": 120
+      },
+      "Type": "AWS::Lambda::Function"
+    },
+    "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "PutS3Replication874E77AC": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "PutS3ReplicationCustomResourcePolicy4AACBE11"
+      ],
+      "Properties": {
+        "Create": {
+          "Fn::Join": [
+            "",
+            [
+              "{\"action\":\"PutBucketReplication\",\"service\":\"S3\",\"parameters\":{\"Bucket\":\"test-prefix-eu-west-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\",\"ReplicationConfiguration\":{\"Role\":\"",
+              {
+                "Fn::GetAtt": [
+                  "TestS3CrrStackAlphaToBravoReplicationRole2AF8A4A9",
+                  "Arn"
+                ]
+              },
+              "\",\"Rules\":[{\"ID\":\"eu-west-1-to-eu-central-1\",\"Status\":\"Enabled\",\"Priority\":1,\"Filter\":{\"Prefix\":\"\"},\"DeleteMarkerReplication\":{\"Status\":\"Enabled\"},\"SourceSelectionCriteria\":{\"ReplicaModifications\":{\"Status\":\"Enabled\"}},\"Destination\":{\"Bucket\":\"arn:aws:s3:::test-prefix-eu-central-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\",\"StorageClass\":\"STANDARD\"}}]}},\"physicalResourceId\":{\"id\":\"s3-replication-test-prefix-eu-west-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\"}}"
+            ]
+          ]
+        },
+        "Delete": {
+          "Fn::Join": [
+            "",
+            [
+              "{\"action\":\"DeleteBucketReplication\",\"service\":\"S3\",\"parameters\":{\"Bucket\":\"test-prefix-eu-west-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\"}}"
+            ]
+          ]
+        },
+        "InstallLatestAwsSdk": true,
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "AWS679f53fac002430cb0da5b7982bd22872D164C4C",
+            "Arn"
+          ]
+        },
+        "Update": {
+          "Fn::Join": [
+            "",
+            [
+              "{\"action\":\"PutBucketReplication\",\"service\":\"S3\",\"parameters\":{\"Bucket\":\"test-prefix-eu-west-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\",\"ReplicationConfiguration\":{\"Role\":\"",
+              {
+                "Fn::GetAtt": [
+                  "TestS3CrrStackAlphaToBravoReplicationRole2AF8A4A9",
+                  "Arn"
+                ]
+              },
+              "\",\"Rules\":[{\"ID\":\"eu-west-1-to-eu-central-1\",\"Status\":\"Enabled\",\"Priority\":1,\"Filter\":{\"Prefix\":\"\"},\"DeleteMarkerReplication\":{\"Status\":\"Enabled\"},\"SourceSelectionCriteria\":{\"ReplicaModifications\":{\"Status\":\"Enabled\"}},\"Destination\":{\"Bucket\":\"arn:aws:s3:::test-prefix-eu-central-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\",\"StorageClass\":\"STANDARD\"}}]}},\"physicalResourceId\":{\"id\":\"s3-replication-test-prefix-eu-west-1-",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "\"}}"
+            ]
+          ]
+        }
+      },
+      "Type": "Custom::AWS",
+      "UpdateReplacePolicy": "Delete"
+    },
+    "PutS3ReplicationCustomResourcePolicy4AACBE11": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetReplicationConfiguration",
+                "s3:PutReplicationConfiguration"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::test-prefix-eu-west-1-",
+                    {
+                      "Ref": "AWS::AccountId"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Action": "iam:PassRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "TestS3CrrStackAlphaToBravoReplicationRole2AF8A4A9",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "PutS3ReplicationCustomResourcePolicy4AACBE11",
+        "Roles": [
+          {
+            "Ref": "AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Policy"
+    },
+    "TestS3CrrStackAlphaToBravoReplicationRole2AF8A4A9": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "s3.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "TestS3CrrStackAlphaToBravoReplicationRoleDefaultPolicyF47EEA9C": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "s3:GetReplicationConfiguration",
+                "s3:ListBucket"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::test-prefix-eu-west-1-",
+                    {
+                      "Ref": "AWS::AccountId"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Action": [
+                "s3:GetObjectVersionForReplication",
+                "s3:GetObjectVersionAcl",
+                "s3:GetObjectVersionTagging"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::test-prefix-eu-west-1-",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Action": [
+                "s3:ReplicateObject",
+                "s3:ReplicateDelete",
+                "s3:ReplicateTags"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:aws:s3:::test-prefix-eu-central-1-",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "/*"
+                  ]
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "TestS3CrrStackAlphaToBravoReplicationRoleDefaultPolicyF47EEA9C",
+        "Roles": [
+          {
+            "Ref": "TestS3CrrStackAlphaToBravoReplicationRole2AF8A4A9"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Policy"
+    }
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5"
+                  ],
+                  {
+                    "Ref": "BootstrapVersion"
+                  }
+                ]
+              }
+            ]
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+        }
+      ]
+    }
+  }
+}
